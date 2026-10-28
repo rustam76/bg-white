@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Layar Putih</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: none;
+    }
+    body {
+      position: fixed;
+      inset: 0;
+      height: 100dvh;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    // Sentuh 1x = masuk fullscreen, sentuh 2x cepat = keluar fullscreen
+    var lastTap = 0;
+    var enteredAt = 0;
+
+    function isFullscreen() {
+      return !!(document.fullscreenElement || document.webkitFullscreenElement);
+    }
+
+    function goFullscreen() {
+      var el = document.documentElement;
+      var req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+      if (req && !isFullscreen()) {
+        try { req.call(el); enteredAt = Date.now(); } catch (e) {}
+      }
+    }
+
+    function exitFullscreen() {
+      var exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+      if (exit && isFullscreen()) {
+        try { exit.call(document); } catch (e) {}
+      }
+    }
+
+    document.addEventListener('click', function () {
+      var now = Date.now();
+      var isDoubleTap = now - lastTap < 350;
+      lastTap = now;
+
+      if (!isFullscreen()) {
+        goFullscreen();
+      } else if (isDoubleTap && now - enteredAt > 600) {
+        // jeda 600ms supaya tap yang baru saja membuka fullscreen tidak langsung menutupnya
+        exitFullscreen();
+        lastTap = 0;
+      }
+    });
+
+    goFullscreen();
+  </script>
+</body>
+</html>
